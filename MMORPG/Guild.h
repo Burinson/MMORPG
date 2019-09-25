@@ -7,7 +7,7 @@ class Guild {
 public:
 private:
     string name;
-    size_t size;
+    int size;
 
 };
 #endif // GUILD_H

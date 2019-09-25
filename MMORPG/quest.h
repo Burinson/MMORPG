@@ -7,19 +7,19 @@ public:
     string getName() const;
     void setName(const string &value);
 
-    size_t getExp() const;
-    void setExp(const size_t &value);
+    int getExp() const;
+    void setExp(const int &value);
 
-    size_t getUnlock_level() const;
-    void setUnlock_level(const size_t &value);
+    int getUnlock_level() const;
+    void setUnlock_level(const int &value);
 
     Quest();
-    Quest(string name, size_t exp, size_t unlock_level);
+    Quest(string name, int exp, int unlock_level);
 
 private:
     string name;
-    size_t exp;
-    size_t unlock_level;
+    int exp;
+    int unlock_level;
 };
 
 #endif // QUEST_H
@@ -34,22 +34,22 @@ void Quest::setName(const string &value)
 name = value;
 }
 
-size_t Quest::getExp() const
+int Quest::getExp() const
 {
 return exp;
 }
 
-void Quest::setExp(const size_t &value)
+void Quest::setExp(const int &value)
 {
 exp = value;
 }
 
-size_t Quest::getUnlock_level() const
+int Quest::getUnlock_level() const
 {
 return unlock_level;
 }
 
-void Quest::setUnlock_level(const size_t &value)
+void Quest::setUnlock_level(const int &value)
 {
     unlock_level = value;
 }
@@ -60,7 +60,7 @@ Quest::Quest()
     this->unlock_level = 1;
 }
 
-Quest::Quest(string name, size_t exp, size_t unlock_level)
+Quest::Quest(string name, int exp, int unlock_level)
 {
     this->name = name;
     this->exp = exp;

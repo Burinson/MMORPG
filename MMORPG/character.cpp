@@ -47,12 +47,12 @@ void Character::setGuild(const string &value)
     guild = value;
 }
 
-size_t Character::getExp() const
+int Character::getExp() const
 {
     return exp;
 }
 
-void Character::setExp(const size_t &value)
+void Character::setExp(const int &value)
 {
     exp = value;
 }
@@ -77,12 +77,12 @@ void Character::setLog(const vector<Quest> &value)
     log = value;
 }
 
-size_t Character::getLevel() const
+int Character::getLevel() const
 {
     return level;
 }
 
-void Character::setLevel(const size_t &value)
+void Character::setLevel(const int &value)
 {
     level = value;
 }

@@ -22,8 +22,8 @@ public:
     string getGuild() const;
     void setGuild(const string &value);
 
-    size_t getExp() const;
-    void setExp(const size_t &value);
+    int getExp() const;
+    void setExp(const int &value);
 
     map<Weapon, int> getInventory() const;
     void setInventory(const map<Weapon, int> &value);
@@ -31,8 +31,8 @@ public:
     vector<Quest> getLog() const;
     void setLog(const vector<Quest> &value);
 
-    size_t getLevel() const;
-    void setLevel(const size_t &value);
+    int getLevel() const;
+    void setLevel(const int &value);
 
     Character(string name, string gender, string type);
 
@@ -41,8 +41,8 @@ private:
     string gender;
     string type;
     string guild;
-    size_t exp;
-    size_t level;
+    int exp;
+    int level;
     map<Weapon, int> inventory;
     vector<Quest> log;
 

@@ -7,15 +7,15 @@ public:
     string getName() const;
     void setName(const string &value);
 
-    size_t getLethality() const;
-    void setLethality(const size_t &value);
+    int getLethality() const;
+    void setLethality(const int &value);
 
     Weapon();
-    Weapon(string name, size_t lethality);
+    Weapon(string name, int lethality);
 
 private:
     string name;
-    size_t lethality;
+    int lethality;
 };
 
 #endif // WEAPON_H
@@ -30,12 +30,12 @@ void Weapon::setName(const string &value)
 name = value;
 }
 
-size_t Weapon::getLethality() const
+int Weapon::getLethality() const
 {
 return lethality;
 }
 
-void Weapon::setLethality(const size_t &value)
+void Weapon::setLethality(const int &value)
 {
     lethality = value;
 }
@@ -45,7 +45,7 @@ Weapon::Weapon()
     this->lethality = 1;
 }
 
-Weapon::Weapon(string name, size_t lethality)
+Weapon::Weapon(string name, int lethality)
 {
     this->name =  name;
     this->lethality = lethality;

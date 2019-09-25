@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -19,39 +20,31 @@ private:
 template<typename T>
 void write(ostream& file, const T& value) {
     T val = value;
-    file.write(reinterpret_cast<const char *>(&val), sizeof(T));
-}
-// Write size
-template<typename T>
-void write_size(ostream& file, const T& value) {
-    size_t size = sizeof(value);
+    int size = sizeof(value);
     file.write(reinterpret_cast<char *>(&size), sizeof(size));
+    file.write(reinterpret_cast<const char *>(&val), sizeof(T));
 }
 // Read
 template<typename T>
-void read(istream& file, T& value, size_t &len) {
+void read(istream& file, T& value) {
+    int len;
+    file.read(reinterpret_cast<char *>(&len), sizeof(len));
     file.read(reinterpret_cast<char *>(&value), int(len));
 }
 
 // Write string
 void write_string(ofstream& file, const string& value) {
-    file.write(value.c_str(), int(value.size()));
-}
-// Write string size
-void write_string_size(ofstream& file, const string& value) {
-    size_t size = value.size();
+    int size = value.size();
     file.write(reinterpret_cast<char *>(&size), sizeof(size));
-}
-
-// Read size
-void read_size(ifstream& file, size_t &len) {
-    file.read(reinterpret_cast<char *>(&len), sizeof(len));
+    file.write(value.c_str(), size);
 }
 
 // Read string
-void read_string(ifstream& file, string &attr, size_t len) {
+void read_string(ifstream& file, string &attr) {
+    int len;
+    file.read(reinterpret_cast<char *>(&len), sizeof(len));
     char *buffer = new char[len];
-    file.read(buffer, int(len));
+    file.read(buffer, len);
     attr = buffer;
     delete [] buffer;
 }
@@ -62,34 +55,27 @@ void File::add()
     if (file.fail())
         cout << "Ocurrió un error escribiendo a este archivo" << endl;
     string str;
-    size_t len;
+    int len;
 
     cout << "Nombre: ";
     cin >> str;
     len = str.size();
-    write_string_size(file, str);
     write_string(file, str);
 
     cout << "Género: " ;
     cin >> str;
     len = str.size();
-    write_string_size(file, str);
     write_string(file, str);
 
     cout << "Tipo: ";
     cin >> str;
     len = str.size();
-    write_string_size(file, str);
     write_string(file, str);
 
-    write_string_size(file, "NaN");
     write_string(file, "NaN");
-
-    write_size(file, 0);
-    write(file, 0);
-
-    write_size(file, 1);
-    write(file, 1);
+    int exp = 0, level = 1;
+    write(file, exp);
+    write(file, level);
 
     file.close();
 
@@ -111,32 +97,21 @@ void File::show()
     if (file.fail())
         cout << "No existe este archivo" << endl;
 
-    size_t len;
     string name;
     string gender;
     string type;
     string guild;
-    size_t exp;
-    size_t level;
+    int exp;
+    int level;
     cout << endl << "----------------------------" << endl;
     while(true) {
-        read_size(file, len);
-        read_string(file, name, len);
+        read_string(file, name);
+        read_string(file, gender);
+        read_string(file, type);
+        read_string(file, guild);
+        read(file, exp);
+        read(file, level);
 
-        read_size(file, len);
-        read_string(file, gender, len);
-
-        read_size(file, len);
-        read_string(file, type, len);
-
-        read_size(file, len);
-        read_string(file, guild, len);
-
-        read_size(file, len);
-        read(file, exp, len);
-
-        read_size(file, len);
-        read(file, level, len);
 
         if (file.eof())
             break;
