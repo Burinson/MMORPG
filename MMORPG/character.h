@@ -36,6 +36,9 @@ public:
 
     Character(string name, string gender, string type);
 
+    int getMoney() const;
+    void setMoney(int value);
+
 private:
     string name;
     string gender;
@@ -43,9 +46,9 @@ private:
     string guild;
     int exp;
     int level;
+    int money;
     map<Weapon, int> inventory;
     vector<Quest> log;
-
 };
 
 #endif // CHARACTER_H

@@ -5,6 +5,7 @@ Character::Character()
     this->exp = 0;
     this->level = 1;
     this->guild = "NaN";
+    this->money = 0;
 }
 
 string Character::getName() const
@@ -92,4 +93,14 @@ Character::Character(string name, string gender, string type)
     this->name = name;
     this->gender = gender;
     this->type = type;
+}
+
+int Character::getMoney() const
+{
+    return money;
+}
+
+void Character::setMoney(int value)
+{
+    money = value;
 }

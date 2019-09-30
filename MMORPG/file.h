@@ -5,6 +5,9 @@
 #include <cstring>
 #include <string>
 #include <sstream>
+#include <character.h>
+#include <map>
+#include <vector>
 
 using namespace std;
 
@@ -16,6 +19,32 @@ public:
     void remove(string searchName);
     void show(string searchName);
     bool validate(const string attr, const string search);
+    void completeQuest(string searchName, int idx);
+    void showQuests();
+    void showWeapons();
+    void addWeapon(string searchName, int idx);
+
+    vector<Quest> quests = {
+        // nombre, experiencia, nivel, recompensa
+        Quest("Destruir el castillo de Notradamn", 500, 1, 10),
+        Quest("Ayudar a Alf a encontrar su casa", 600, 2, 10),
+        Quest("Regresar el anillo de Frodo", 700, 2, 20),
+        Quest("Darle de comer al michi", 100, 3, 30),
+        Quest("Derrotar a Trosvteskteski", 1000, 4, 100),
+        Quest("Clasificar 500 rocas por su nombre", 500, 5, 200),
+        Quest("Encontrar el conejo de la viejita", 2000, 10, 1000),
+        Quest("Jugar canicas con el hermitaño", 2500, 13, 10000),
+        Quest("Derrotar al gran yeti de las nieves", 5000, 20, 20000)
+    };
+    vector<Weapon> weapons = {
+        // nombre, letalidad, nivel, precio
+      Weapon("Palo de madera", 5, 1, 20),
+      Weapon("Varita de metal", 10, 3, 300),
+      Weapon("Daga de hierro", 20, 5, 500),
+      Weapon("Boomerang", 50, 10, 2000),
+      Weapon("Bomba", 100, 15, 10000),
+      Weapon("Lanzallamas", 200, 20, 20000)
+    };
 private:
 };
 // Write
@@ -76,13 +105,14 @@ bool File::validate(const string attr, const string search)
         return true;
 }
 
+
 void File::add()
 {
     ofstream file("characters.bin", ios::out | ios::binary | ios::app);
     if (file.fail())
         cout << "Ocurrió un error escribiendo a este archivo" << endl;
     string name, gender, type;
-    int exp = 0, level = 1;
+    int exp = 0, level = 1, money = 0;
 
     cout << "Nombre: ";
     cin >> name;
@@ -103,6 +133,7 @@ void File::add()
     write_string(file, "NULL");
     write(file, exp);
     write(file, level);
+    write(file, money);
 
     file.close();
 
@@ -110,7 +141,7 @@ void File::add()
 void File::modify(string &search, string attr)
 {
     string name, gender, type, guild;
-    int exp, level;
+    int exp, level, money;
     ifstream file("characters.bin", ios::binary | ios::in);
     if (file.fail())
         cout << "No existe este archivo" << endl;
@@ -123,6 +154,7 @@ void File::modify(string &search, string attr)
         read_string(file, guild);
         read(file, exp);
         read(file, level);
+        read(file, money);
         if (search == name) {
             if (attr == "name") {
                 cout << "Nombre nuevo: " << endl;
@@ -136,20 +168,35 @@ void File::modify(string &search, string attr)
                 }
                 search = name;
             } else if (attr == "gender") {
-                cout << "Género nuevo: " << endl;
+                cout << "Género nuevo: ";
                 cin >> gender;
             } else if (attr == "type") {
-                cout << "Tipo nuevo: " << endl;
+                cout << "Tipo nuevo: " ;
                 cin >> type;
             } else if (attr == "guild") {
-                cout << "Gremio nuevo: " << endl;
+                cout << "Gremio nuevo: ";
                 cin >> guild;
             } else if (attr == "exp") {
-                cout << "Experiencia nueva: " << endl;
+                cout << "Experiencia nueva: ";
                 cin >> exp;
+                int i = 0, cnt = 0;
+                while(exp >= cnt) {
+                    i++;
+                    cnt+=i*100;
+                }
+                level = i;
             } else if (attr == "level") {
-                cout << "Nivel nuevo: " << endl;
+                cout << "Nivel nuevo: ";
                 cin >> level;
+                int cnt = 0, i = 0;
+                while(i < level) {
+                    cnt += i*100;
+                    ++i;
+                }
+                exp = cnt;
+            } else if (attr == "money") {
+                cout << "Dinero nuevo: $";
+                cin >> money;
             }
         }
 
@@ -161,6 +208,7 @@ void File::modify(string &search, string attr)
         write_string(help, guild);
         write(help, exp);
         write(help, level);
+        write(help, money);
     }
     help.close();
     file.close();
@@ -168,10 +216,159 @@ void File::modify(string &search, string attr)
     std::rename("help.bin", "characters.bin");
 }
 
+void File::completeQuest(string searchName, int idx)
+{
+    int rewardExp = quests[idx-1].getExp();
+    int unlockLvl = quests[idx-1].getUnlock_level();
+    int reward = quests[idx-1].getReward();
+    string questName = quests[idx-1].getName();
+    string name, gender, type, guild;
+    int exp, level, money;
+    ifstream file("characters.bin", ios::binary | ios::in);
+    if (file.fail())
+        cout << "No existe este archivo" << endl;
+    ofstream help("help.bin", ios::binary | ios::out | ios::app);
+
+    ofstream log_file(searchName+"_log.bin", ios::binary | ios::out | ios::app);
+
+    while(true) {
+        read_string(file, name);
+        read_string(file, gender);
+        read_string(file, type);
+        read_string(file, guild);
+        read(file, exp);
+        read(file, level);
+        read(file, money);
+        if (searchName == name) {
+            if (level >= unlockLvl) {
+                exp += rewardExp;
+                money += reward;
+                int i = 0, cnt = 0;
+                while(exp >= cnt) {
+                    i++;
+                    cnt+=i*100;
+                }
+                level = i;
+                write_string(log_file, questName);
+                write(log_file, rewardExp);
+                write(log_file, unlockLvl);
+            } else {
+                cout << "No tienes el nivel suficiente para completar esta misión" << endl;
+                help.close();
+                file.close();
+                std::remove("help.bin");
+                return;
+            }
+        }
+
+        if (file.eof())
+            break;
+        write_string(help, name);
+        write_string(help, gender);
+        write_string(help, type);
+        write_string(help, guild);
+        write(help, exp);
+        write(help, level);
+        write(help, money);
+    }
+    help.close();
+    file.close();
+    log_file.close();
+    std::remove("characters.bin");
+    std::rename("help.bin", "characters.bin");
+    cout << searchName << " ha obtenido " << rewardExp <<" exp" << endl;
+}
+
+void File::showQuests()
+{
+    for(int i = 0; i < quests.size(); ++i) {
+        cout << i+1 << ") " << quests[i].getName() << endl
+             << " \t nivel: " << quests[i].getUnlock_level()
+             << " \t exp: " << quests[i].getExp()
+             << " \t recompensa: $" << quests[i].getReward() << endl << endl;
+    }
+}
+
+void File::showWeapons()
+{
+    for(int i = 0; i < weapons.size(); ++i) {
+        cout << i+1 << ") " << weapons[i].getName() << endl
+             << " \t letalidad: " << weapons[i].getLethality()
+             << " \t nivel: " << weapons[i].getLevel()
+             << " \t precio: $" << weapons[i].getPrice() << endl << endl;
+    }
+}
+
+void File::addWeapon(string searchName, int idx)
+{
+    int unlockLvl = weapons[idx-1].getLevel();
+    int price = weapons[idx-1].getPrice();
+    int lethality = weapons[idx-1].getLethality();
+    string weaponName = weapons[idx-1].getName();
+
+    string name, gender, type, guild;
+    int exp, level, money;
+    ifstream file("characters.bin", ios::binary | ios::in);
+    if (file.fail())
+        cout << "No existe este archivo" << endl;
+    ofstream help("help.bin", ios::binary | ios::out | ios::app);
+
+    ofstream inv_file(searchName+"_inv.bin", ios::binary | ios::out | ios::app);
+
+    while(true) {
+        read_string(file, name);
+        read_string(file, gender);
+        read_string(file, type);
+        read_string(file, guild);
+        read(file, exp);
+        read(file, level);
+        read(file, money);
+        if (searchName == name) {
+            if (level >= unlockLvl) {
+                if (money >= price) {
+                    write_string(inv_file, weaponName);
+                    write(inv_file, lethality);
+                    write(inv_file, unlockLvl);
+                    write(inv_file, price);
+                    money -= price;
+                } else {
+                    cout << "No tienes el dinero suficiente para comprar esta arma" << endl;
+                    help.close();
+                    file.close();
+                    std::remove("help.bin");
+                    return;
+                }
+            } else {
+                cout << "No tienes el nivel suficiente para utilizar esta arma" << endl;
+                help.close();
+                file.close();
+                std::remove("help.bin");
+                return;
+            }
+        }
+
+        if (file.eof())
+            break;
+        write_string(help, name);
+        write_string(help, gender);
+        write_string(help, type);
+        write_string(help, guild);
+        write(help, exp);
+        write(help, level);
+        write(help, money);
+    }
+    help.close();
+    file.close();
+    inv_file.close();
+    std::remove("characters.bin");
+    std::rename("help.bin", "characters.bin");
+    cout << searchName << " ha comprado un " << weaponName << endl;
+}
+
 string File::authenticate()
 {
     string search, name, gender, type, guild;
-    int exp, level;
+    int exp, level, money;
     ifstream file("characters.bin", ios::binary | ios::in);
     if (file.fail())
         cout << "No existe este archivo" << endl;
@@ -185,6 +382,7 @@ string File::authenticate()
         read_string(file, guild);
         read(file, exp);
         read(file, level);
+        read(file, money);
 
         if (search == name) {
             file.close();
@@ -202,7 +400,7 @@ string File::authenticate()
 void File::remove(string searchName)
 {
     string name, gender, type, guild;
-    int exp, level;
+    int exp, level, money;
     ifstream file("characters.bin", ios::binary | ios::in);
     if (file.fail())
         cout << "No existe este archivo" << endl;
@@ -215,6 +413,7 @@ void File::remove(string searchName)
         read_string(file, guild);
         read(file, exp);
         read(file, level);
+        read(file, money);
         if (file.eof())
             break;
         if (searchName != name) {
@@ -224,6 +423,7 @@ void File::remove(string searchName)
             write_string(help, guild);
             write(help, exp);
             write(help, level);
+            write(help, money);
         }
 
     }
@@ -240,7 +440,7 @@ void File::show(string searchName = "default")
         cout << "No existe este archivo" << endl;
 
     string name, gender, type, guild;
-    int exp, level;
+    int exp, level, money;
     cout << endl << "----------------------------" << endl;
     while(true) {
         read_string(file, name);
@@ -249,7 +449,7 @@ void File::show(string searchName = "default")
         read_string(file, guild);
         read(file, exp);
         read(file, level);
-
+        read(file, money);
 
         if (file.eof())
             break;
@@ -259,7 +459,8 @@ void File::show(string searchName = "default")
                  << "Tipo: " << type << endl
                  << "Gremio: " << guild << endl
                  << "Experiencia: " << exp << endl
-                 << "Nivel: " << level << endl;
+                 << "Nivel: " << level << endl
+                 << "Dinero: $" << money << endl;
             cout << "----------------------------" << endl;
         }
 
