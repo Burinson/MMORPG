@@ -33,6 +33,8 @@ void Menu::show()
                     cout << "3) Mostrar personaje" << endl;
                     cout << "4) Completar misión" << endl;
                     cout << "5) Agregar arma" << endl;
+                    cout << "6) Mostrar historial" << endl;
+                    cout << "7) Mostrar inventario" << endl;
                     cout << "0) Regresar" << endl;
                     cin >> op2;
                     switch(op2) {
@@ -109,6 +111,13 @@ void Menu::show()
                         if (idx > 0) {
                             f.addWeapon(name, idx);
                         }
+                        break;
+                    case 6:
+                        f.showLog(name);
+                        break;
+                    case 7:
+                        f.showInv(name);
+                        break;
                     case 0:
                         break;
                     default:
